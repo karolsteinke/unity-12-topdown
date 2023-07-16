@@ -4,20 +4,26 @@ using UnityEngine;
 
 [RequireComponent (typeof(PlayerManager))]
 [RequireComponent (typeof(InventoryManager))]
+[RequireComponent (typeof(MissionManager))]
 
 public class Managers : MonoBehaviour {
     public static PlayerManager Player {get; private set;} //why capital case?
     public static InventoryManager Inventory {get; private set;}
-
+    public static MissionManager Mission {get; private set;}
     private List<IGameManager> _startSequence;
 
     void Awake() {
+        //Unity's command to persist an object between scenes
+        DontDestroyOnLoad(gameObject);
+
         Player = GetComponent<PlayerManager>();
         Inventory = GetComponent<InventoryManager>();
+        Mission = GetComponent<MissionManager>();
 
         _startSequence = new List<IGameManager>();
         _startSequence.Add(Player);
         _startSequence.Add(Inventory);
+        _startSequence.Add(Mission);
 
         StartCoroutine(StartupManagers());
     }
@@ -46,11 +52,13 @@ public class Managers : MonoBehaviour {
             }
             if (numReady > lastReady) {
                 Debug.Log("Managers progress: " + numReady + "/" + numModules);
+                Messenger<int, int>.Broadcast(StartupEvent.MANAGERS_PROGRESS, numReady, numModules);
             }
             //pause for one frame
             yield return null;
         }
         
         Debug.Log("All managers started up");
+        Messenger.Broadcast(StartupEvent.MANAGERS_STARTED);
     }
 }
