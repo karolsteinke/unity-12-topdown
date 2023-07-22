@@ -12,8 +12,17 @@ public class InventoryManager : MonoBehaviour, IGameManager
     public void Startup(NetworkService service) {
         Debug.Log("Inventory manager starting...");
         _network = service;
-        _items = new Dictionary<string, int>();
+        UpdateData(new Dictionary<string, int>());
         status = ManagerStatus.Started;
+    }
+
+    public void UpdateData(Dictionary<string, int> items) {
+        this._items = items;
+    }
+
+    //getter for save game code to access the data
+    public Dictionary<string, int> GetData() {
+        return _items;
     }
 
     public void AddItem(string name) {

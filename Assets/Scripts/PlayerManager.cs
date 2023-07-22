@@ -12,14 +12,25 @@ public class PlayerManager : MonoBehaviour, IGameManager
     public void Startup(NetworkService service) {
         Debug.Log("Player manager starting...");
         _network = service;
-        health = 50;
-        maxHealth = 100;
+        UpdateDate(50,100);
         status = ManagerStatus.Started;
     }
 
     public void ChangeHealth(int value) {
         health += value;
         health = Mathf.Clamp(health, 0, maxHealth);
+        if (health == 0) {
+            Messenger.Broadcast(GameEvent.LEVEL_FAILED);
+        }
         Messenger.Broadcast(GameEvent.HEALTH_UPDATED);
+    }
+
+    public void UpdateDate(int health, int maxHealth) {
+        this.health = health;
+        this.maxHealth = maxHealth;
+    }
+
+    public void Respawn() {
+        UpdateDate(50,100);
     }
 }
